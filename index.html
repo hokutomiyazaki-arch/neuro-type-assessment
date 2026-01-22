@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="神経タイプ診断 - 自分の神経タイプを分析するFNTアプリ">
+    
+    <title>神経タイプ診断</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="FNT512.png">
+    <link rel="icon" type="image/png" href="FNT512.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ユニバーサルデザイン準拠配色 - WCAG 2.1 AA基準 */
+        :root {
+            --primary-bg: #1a1a2e;
+            --secondary-bg: #16213e;
+            --accent-color: #00a8e8;
+            --accent-light: #00d4ff;
+            --accent-dark: #0077b6;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-on-dark: #ffffff;
+            --success-color: #00c853;
+            --warning-color: #ffab00;
+            --danger-color: #ff5252;
+            --card-bg: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.25);
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --gold-color: #c5a47e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            touch-action: none;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        /* スプラッシュスクリーン */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 24px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .splash-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .splash-app-name {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent-light);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .splash-copyright {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        /* メインコンテナ */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ヘッダー */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            padding-top: max(12px, env(safe-area-inset-top));
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .menu-btn {
+            width: 44px;
+            height: 44px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y !important;
+            padding: 20px;
+            padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom)));
+        }
+
+        .main-content * {
+            touch-action: auto !important;
+        }
+
+        /* カード */
+        .card {
+            background: rgba(30, 40, 60, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--accent-light);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .card-description {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+
+        /* 質問セクション */
+        .question-section {
+            display: none;
+        }
+
+        .question-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+
+        .question-note {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        /* ボタン */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 17px;
+            font-weight: 700;
+            font-family: inherit;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 168, 232, 0.4);
+        }
+
+        .btn-yes:hover, .btn-yes:active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 168, 232, 0.5);
+        }
+
+        .btn-no {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-no:hover, .btn-no:active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: var(--accent-color);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #ff8f00 100%);
+            color: #1a1a1a;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(255, 171, 0, 0.4);
+        }
+
+        .btn-restart:hover, .btn-restart:active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 171, 0, 0.5);
+        }
+
+        /* 結果セクション */
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-type {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--success-color);
+            text-align: center;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0, 200, 83, 0.3);
+        }
+
+        .result-subtitle {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        /* 結果画像 */
+        .result-image-container {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .result-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .result-description {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 2;
+            padding: 20px;
+            background: rgba(0, 200, 83, 0.15);
+            border-radius: 12px;
+            border-left: 5px solid var(--success-color);
+            margin-bottom: 20px;
+        }
+
+        .result-description strong {
+            color: var(--accent-light);
+            font-weight: 700;
+        }
+
+        /* こんな人セクション */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold-color);
+            margin: 24px 0 12px 0;
+            padding-left: 12px;
+            border-left: 4px solid var(--gold-color);
+        }
+
+        .condition-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .condition-list li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 8px 0 8px 24px;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .condition-list li::before {
+            content: "✓";
+            color: var(--success-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* ドリルリスト */
+        .drill-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .drill-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .drill-list li::before {
+            content: "▶";
+            color: var(--gold-color);
+            position: absolute;
+            left: 0;
+            font-size: 10px;
+            top: 4px;
+        }
+
+        .drill-link {
+            color: var(--accent-light);
+            text-decoration: none;
+            border-bottom: 1px dotted rgba(0, 212, 255, 0.5);
+            transition: all 0.2s;
+        }
+
+        .drill-link:hover, .drill-link:active {
+            color: var(--gold-color);
+            border-bottom-color: var(--gold-color);
+        }
+
+        /* 動画コンテナ */
+        .video-container {
+            margin: 24px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .video-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-light);
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* プログレスバー */
+        .progress-container {
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-light) 100%);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        /* フッター */
+        .footer {
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* サイドメニュー */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            max-width: 85vw;
+            height: 100%;
+            background: var(--secondary-bg);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding-top: max(20px, env(safe-area-inset-top));
+        }
+
+        .side-menu.active {
+            right: 0;
+        }
+
+        .close-menu-btn {
+            position: absolute;
+            top: max(15px, env(safe-area-inset-top));
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .menu-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .menu-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y !important;
+            padding: 20px;
+        }
+
+        .menu-content * {
+            touch-action: auto !important;
+        }
+
+        .menu-section {
+            margin-bottom: 28px;
+        }
+
+        .menu-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-light);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .menu-section p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .type-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .type-list li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .type-list li strong {
+            color: var(--text-primary);
+        }
+
+        .warning-text {
+            background: rgba(255, 82, 82, 0.15);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--danger-color);
+        }
+
+        /* iOS PWAインストール案内 */
+        .ios-install-prompt {
+            position: fixed;
+            bottom: -100px;
+            left: 0;
+            right: 0;
+            background: var(--secondary-bg);
+            padding: 16px;
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+            border-top: 1px solid var(--border-color);
+            transition: bottom 0.3s ease;
+            z-index: 998;
+        }
+
+        .ios-install-prompt.show {
+            bottom: 0;
+        }
+
+        .ios-install-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .ios-install-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .ios-install-close {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+
+        /* スタートボタン */
+        .btn-start {
+            background: linear-gradient(135deg, var(--success-color) 0%, #00a844 100%);
+            color: white;
+            font-size: 20px;
+            padding: 20px 32px;
+            box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
+        }
+
+        .btn-start:hover, .btn-start:active {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 200, 83, 0.5);
+        }
+
+        /* ドリルカテゴリ */
+        .drill-category {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-light);
+            margin: 16px 0 8px 0;
+            padding: 8px 12px;
+            background: rgba(0, 168, 232, 0.15);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <!-- スプラッシュスクリーン -->
+    <div class="splash-screen" id="splashScreen">
+        <img src="FNT512.png" alt="FNT Logo" class="splash-logo">
+        <div class="splash-title">FUNCTIONAL NEURO TRAINING</div>
+        <div class="splash-app-name">神経タイプ診断</div>
+        <div class="splash-copyright">© Legrandchariot</div>
+    </div>
+
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="header">
+            <img src="FNT512.png" alt="FNT" class="header-logo">
+            <h1 class="header-title">神経タイプ診断</h1>
+            <button class="menu-btn" id="menuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content" id="mainContent">
+            
+            <!-- スタート画面 -->
+            <div class="question-section active" id="startSection">
+                <div class="card">
+                    <h2 class="card-title">🧠 神経タイプ診断</h2>
+                    <p class="card-description">
+                        この診断では、いくつかの質問に答えていただくことで、
+                        あなたの不調パターンがどの神経領域に関連しているかを分析します。<br><br>
+                        結果に基づいて、最適なアプローチ方法とドリルをご提案します。
+                    </p>
+                    <button class="btn btn-start" onclick="startDiagnosis()">診断を開始する →</button>
+                </div>
+            </div>
+
+            <!-- Q1: 症状は片側のみ？ -->
+            <div class="question-section" id="q1">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 12.5%;"></div>
+                    </div>
+                    <div class="progress-text">質問 1</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        症状は<br>体の片側のみに出ますか？
+                    </p>
+                    <p class="question-note">
+                        例：右肩だけ痛い、左膝だけ違和感がある等
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q1', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q1', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q2: 症状の反対側に怪我の経験 -->
+            <div class="question-section" id="q2">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%;"></div>
+                    </div>
+                    <div class="progress-text">質問 2</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        症状の反対側に<br>過去の怪我の経験はありますか？
+                    </p>
+                    <p class="question-note">
+                        例：右肩が痛いが、過去に左足を骨折した等
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q2', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q2', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q3: 症状の箇所に感覚異常 -->
+            <div class="question-section" id="q3">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 37.5%;"></div>
+                    </div>
+                    <div class="progress-text">質問 3</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        症状の箇所に<br>感覚の異常はありますか？
+                    </p>
+                    <p class="question-note">
+                        しびれ、ピリピリ感、感覚の鈍さ等
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q3', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q3', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q4: 症状が片側のみに繰り返し起こる -->
+            <div class="question-section" id="q4">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%;"></div>
+                    </div>
+                    <div class="progress-text">質問 2</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        いつも同じ側（片側）で<br>症状が繰り返し起こる？
+                    </p>
+                    <p class="question-note">
+                        怪我や痛みがいつも同じ側に出る等
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q4', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q4', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q5: 動かなくても痛い -->
+            <div class="question-section" id="q5">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%;"></div>
+                    </div>
+                    <div class="progress-text">質問 3</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        動かなくても痛い、<br>鈍痛や不快感が常にある？
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q5', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q5', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q6: 不器用でスポーツが苦手 -->
+            <div class="question-section" id="q6">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 55%;"></div>
+                    </div>
+                    <div class="progress-text">質問 4</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        不器用でスポーツが苦手？
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q6', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q6', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q7: バランスが悪く背骨が硬い -->
+            <div class="question-section" id="q7">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 70%;"></div>
+                    </div>
+                    <div class="progress-text">質問 5</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        バランスが悪く、<br>背骨が硬い？
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q7', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q7', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q8: ボディワークは好きだけどボールスポーツは苦手 -->
+            <div class="question-section" id="q8">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%;"></div>
+                    </div>
+                    <div class="progress-text">質問 6</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        ボディワークは好きだけど<br>ボールスポーツは苦手？
+                    </p>
+                    <p class="question-note">
+                        ヨガやストレッチは得意だが、球技は苦手等
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q8', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q8', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 結果セクション ========== -->
+
+            <!-- 結果: 脳幹タイプ（過去の怪我あり） -->
+            <div class="result-section" id="result-brainstem-injury">
+                <div class="card">
+                    <div class="result-type">脳幹タイプ</div>
+                    <div class="result-subtitle">Brain Stem - 症状と反対側の過去の怪我へのアプローチ</div>
+                    
+                    <div class="result-image-container">
+                        <img src="5.png" alt="脳幹タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        不調が起こっている場所の本当の原因が、<strong>問題箇所の反対半身</strong>にある可能性が高いのが脳幹タイプです。<br><br>
+                        痛い箇所をマッサージすると悪化したりしませんか？<br><br>
+                        その場合、<strong>反対半身</strong>（右肩の痛みなら、左半身）で過去の怪我の感覚刺激や、ミラーイメージを行います。
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>いつも片側で痛みが起こる</li>
+                        <li>高血圧の問題がある</li>
+                        <li>猫背、巻肩</li>
+                        <li>捻挫などの怪我をすることが多い</li>
+                    </ul>
+
+                    <div class="section-title">選ぶドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/photo/mirror-image/" class="drill-link" target="_blank">ミラーイメージ（絶対に見るべき）</a></li>
+                        <li><a href="https://bodydiscovery.jp/category/motor-control/" class="drill-link" target="_blank">痛みや可動域の問題と対角線の関節でモーターコントロール</a></li>
+                        <li><a href="https://bodydiscovery.jp/1943/" class="drill-link" target="_blank">ペンシルプッシュアップ</a></li>
+                        <li><a href="https://bodydiscovery.jp/2578/" class="drill-link" target="_blank">眼のリセットエクササイズ</a></li>
+                        <li><a href="https://bodydiscovery.jp/531/" class="drill-link" target="_blank">ラテラルオープナー（脳幹の問題側を広げる）</a></li>
+                        <li><a href="https://bodydiscovery.jp/697/" class="drill-link" target="_blank">顎関節</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: 末梢神経タイプ -->
+            <div class="result-section" id="result-peripheral">
+                <div class="card">
+                    <div class="result-type">末梢神経タイプ</div>
+                    <div class="result-subtitle">Peripheral Nerve - 神経伝達の問題</div>
+                    
+                    <div class="result-image-container">
+                        <img src="2.png" alt="末梢神経タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        <strong>末梢神経</strong>が正しく運動指令や感覚信号を伝達していない可能性があります。<br><br>
+                        <strong>モーターコントロール</strong>を使って末梢神経の粘弾性を改善していきましょう！
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>筋力低下が起こっている</li>
+                        <li>感覚がおかしい感じがする（感覚の低下、ピリピリ、痺れ）</li>
+                        <li>ストレッチなど、体を過度に伸ばされて体を傷めたことがある</li>
+                    </ul>
+
+                    <div class="section-title">手や腕のドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/401/" class="drill-link" target="_blank">頚椎のグライディング</a></li>
+                        <li><a href="https://bodydiscovery.jp/1335/" class="drill-link" target="_blank">手根骨フロアモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/1343/" class="drill-link" target="_blank">手根骨ハンドフィギュア８</a></li>
+                        <li><a href="https://bodydiscovery.jp/1250/" class="drill-link" target="_blank">エルボーコーディネーション</a></li>
+                        <li><a href="https://bodydiscovery.jp/538/" class="drill-link" target="_blank">手首リストサークル</a></li>
+                        <li><a href="https://bodydiscovery.jp/283/" class="drill-link" target="_blank">肩甲骨カムシャフト</a></li>
+                    </ul>
+
+                    <div class="section-title">足や脚のドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/183/" class="drill-link" target="_blank">腰椎ランバーサークル（フロントサークル）</a></li>
+                        <li><a href="https://bodydiscovery.jp/105/" class="drill-link" target="_blank">舟状骨トープル</a></li>
+                        <li><a href="https://bodydiscovery.jp/111/" class="drill-link" target="_blank">楔状骨トープル</a></li>
+                        <li><a href="https://bodydiscovery.jp/109/" class="drill-link" target="_blank">立方骨トープル</a></li>
+                        <li><a href="https://bodydiscovery.jp/118/" class="drill-link" target="_blank">踵ラテラルティルト</a></li>
+                        <li><a href="https://bodydiscovery.jp/116/" class="drill-link" target="_blank">踵ミディアルティルト</a></li>
+                        <li><a href="https://bodydiscovery.jp/144/" class="drill-link" target="_blank">股関節（ヒップサークル）</a></li>
+                        <li><a href="https://bodydiscovery.jp/260/" class="drill-link" target="_blank">膝（ニーサークル）</a></li>
+                        <li><a href="https://bodydiscovery.jp/1463/" class="drill-link" target="_blank">中足骨ボールオブフットサークル</a></li>
+                        <li><a href="https://bodydiscovery.jp/92/" class="drill-link" target="_blank">足首アンクルサークル</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: レセプタータイプ -->
+            <div class="result-section" id="result-receptor">
+                <div class="card">
+                    <div class="result-type">レセプタータイプ</div>
+                    <div class="result-subtitle">Receptor Type - 感覚受容器の機能低下</div>
+                    
+                    <div class="result-image-container">
+                        <img src="1.png" alt="レセプタータイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        <strong>レセプター</strong>は、感覚を神経の信号に変換する装置です。<br><br>
+                        怪我などが原因で、外部の刺激を正しく脳に伝えられていない事で中枢神経に不具合が起こっている可能性があります。<br><br>
+                        <strong>感覚に問題がある箇所のレセプター刺激</strong>をメインに行いましょう！
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>過去に手術をした経験がある</li>
+                        <li>打撲のあざ、怪我の傷跡が残っている</li>
+                        <li>着圧の服が好き</li>
+                        <li>たこや、皮膚が硬くなっている箇所がある</li>
+                    </ul>
+
+                    <div class="section-title">簡単テスト</div>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        感覚のテスト（ケガの箇所と周りの皮膚）
+                    </p>
+
+                    <div class="section-title">選ぶドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/3171/" class="drill-link" target="_blank">センサリーウォームアップ</a></li>
+                        <li><a href="https://bodydiscovery.jp/photo/problem-solving-training/" class="drill-link" target="_blank">過去の怪我から改善する方法</a></li>
+                        <li><a href="https://bodydiscovery.jp/category/motor-control/" class="drill-link" target="_blank">ケガの箇所に近い部位のモーターコントロールを選択</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: 脳幹タイプ（片側症状） -->
+            <div class="result-section" id="result-brainstem-lateral">
+                <div class="card">
+                    <div class="result-type">脳幹タイプ</div>
+                    <div class="result-subtitle">Brain Stem - 症状と反対側のアプローチが必要</div>
+                    
+                    <div class="result-image-container">
+                        <img src="5.png" alt="脳幹タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        不調が起こっている場所の本当の原因が、<strong>問題箇所の反対半身</strong>にある可能性が高いのが脳幹タイプです。<br><br>
+                        痛い箇所をマッサージすると悪化したりしませんか？<br><br>
+                        その場合、<strong>反対半身</strong>（右肩の痛みなら、左半身）で過去の怪我の感覚刺激や、ミラーイメージを行います。
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>いつも片側で痛みが起こる</li>
+                        <li>高血圧の問題がある</li>
+                        <li>猫背、巻肩</li>
+                        <li>捻挫などの怪我をすることが多い</li>
+                    </ul>
+
+                    <div class="section-title">簡単テスト</div>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        ジャンプテストで左右の脳幹を決める
+                    </p>
+
+                    <div class="section-title">選ぶドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/photo/mirror-image/" class="drill-link" target="_blank">ミラーイメージ（絶対に見るべき）</a></li>
+                        <li><a href="https://bodydiscovery.jp/category/motor-control/" class="drill-link" target="_blank">痛みや可動域の問題と対角線の関節でモーターコントロール</a></li>
+                        <li><a href="https://bodydiscovery.jp/1943/" class="drill-link" target="_blank">ペンシルプッシュアップ</a></li>
+                        <li><a href="https://bodydiscovery.jp/2578/" class="drill-link" target="_blank">眼のリセットエクササイズ</a></li>
+                        <li><a href="https://bodydiscovery.jp/531/" class="drill-link" target="_blank">ラテラルオープナー（脳幹の問題側を広げる）</a></li>
+                        <li><a href="https://bodydiscovery.jp/697/" class="drill-link" target="_blank">顎関節</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: 島皮質タイプ -->
+            <div class="result-section" id="result-insula">
+                <div class="card">
+                    <div class="result-type">島皮質タイプ</div>
+                    <div class="result-subtitle">Insular Cortex - 内受容感覚の処理に関する問題</div>
+                    
+                    <div class="result-image-container">
+                        <img src="8.png" alt="島皮質タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        <strong>島皮質</strong>は体の感覚と感情を統合するエリアです。<br><br>
+                        自律神経の調整を行ったり、痛みの強さを決定するエリアでもあります。<br><br>
+                        とにかく不快感がずっとある人、動かなくても辛い人は、島皮質に影響が大きい<strong>呼吸など</strong>からはじめましょう！
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>動かなくても常に調子が悪い</li>
+                        <li>体の不調に感情が大きく影響されている</li>
+                        <li>不安感が強い</li>
+                        <li>日々のルーティンにこだわりが強い</li>
+                    </ul>
+
+                    <div class="section-title">簡単テスト</div>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        自分の心拍を正確に数えられる（アプリ使用）
+                    </p>
+
+                    <div class="section-title">選ぶドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/2541/" class="drill-link" target="_blank">フロントオープナー（呼吸）</a></li>
+                        <li><a href="https://bodydiscovery.jp/531/" class="drill-link" target="_blank">ラテラルオープナー（呼吸）</a></li>
+                        <li><a href="https://bodydiscovery.jp/1739/" class="drill-link" target="_blank">ネックフィギュア８</a></li>
+                        <li><a href="https://bodydiscovery.jp/1943/" class="drill-link" target="_blank">ペンシルプッシュアップ</a></li>
+                        <li><a href="https://bodydiscovery.jp/1777/" class="drill-link" target="_blank">注視機能トレーニング</a></li>
+                        <li><a href="https://bodydiscovery.jp/192/" class="drill-link" target="_blank">腰と骨盤のモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/241/" class="drill-link" target="_blank">首のアイソメトリックワーク</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: 小脳タイプ -->
+            <div class="result-section" id="result-cerebellum">
+                <div class="card">
+                    <div class="result-type">小脳タイプ</div>
+                    <div class="result-subtitle">Cerebellum - 協調運動の問題</div>
+                    
+                    <div class="result-image-container">
+                        <img src="4.png" alt="小脳タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        運動の制御（筋肉の働きの調整）が細かやかにできていないことで、筋肉や痛みの問題となっているタイプです。<br><br>
+                        左右でどちらの小脳かを<strong>RAPSのテスト</strong>で確かめて、苦手な方にアプローチしてみましょう！<br><br>
+                        <strong>※苦手な側の小脳の問題＝苦手な側の体側でモーターコントロールを行う</strong>
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>手先が不器用</li>
+                        <li>物を掴むときに手足が震える</li>
+                        <li>起立性低血圧（立ちくらみ）がある</li>
+                        <li>人混みが苦手</li>
+                    </ul>
+                    
+                    <div class="video-container">
+                        <div class="video-title">📹 小脳の左右差チェック動画（RAPS）</div>
+                        <div class="video-wrapper">
+                            <iframe src="https://player.vimeo.com/video/888910549?h=91b2d3eaa2" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="section-title">選ぶドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/category/motor-control/" class="drill-link" target="_blank">問題の箇所でモーターコントロール</a></li>
+                        <li><a href="https://bodydiscovery.jp/1943/" class="drill-link" target="_blank">ペンシルプッシュアップ</a></li>
+                        <li><a href="https://bodydiscovery.jp/1777/" class="drill-link" target="_blank">注視機能トレーニング</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: 脊髄タイプ -->
+            <div class="result-section" id="result-spinal">
+                <div class="card">
+                    <div class="result-type">脊髄タイプ</div>
+                    <div class="result-subtitle">Spinal Cord - 中心軸の問題</div>
+                    
+                    <div class="result-image-container">
+                        <img src="3.png" alt="脊髄タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        <strong>脊髄の代謝</strong>が悪く中心軸の問題が起こっているケースです。<br><br>
+                        まずは<strong>脊髄関連のモビリゼーション</strong>から始めましょう！
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>両側に痛みや動きの問題が起こっている</li>
+                        <li>揺れながら歩いている、バランスが良くない</li>
+                        <li>脊椎関連の問題（ムチウチ、狭窄、ヘルニアなど）</li>
+                        <li>体幹の弱さを感じる</li>
+                        <li>長く立っていると背筋が疲れてしまう</li>
+                    </ul>
+
+                    <div class="section-title">選ぶドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/1943/" class="drill-link" target="_blank">ペンシルプッシュアップ</a></li>
+                        <li><a href="https://bodydiscovery.jp/1777/" class="drill-link" target="_blank">注視</a></li>
+                        <li><a href="https://bodydiscovery.jp/241/" class="drill-link" target="_blank">首のアイソメトリックワーク</a></li>
+                        <li><a href="https://bodydiscovery.jp/192/" class="drill-link" target="_blank">腰と骨盤のモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/183/" class="drill-link" target="_blank">腰椎ランバーサークル</a></li>
+                        <li><a href="https://bodydiscovery.jp/169/" class="drill-link" target="_blank">骨盤のモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/523/" class="drill-link" target="_blank">胸椎のモビライゼーション</a></li>
+                        <li><a href="https://bodydiscovery.jp/401/" class="drill-link" target="_blank">頚椎のグライディング</a></li>
+                        <li><a href="https://bodydiscovery.jp/399/" class="drill-link" target="_blank">頚椎のカップリングモーション</a></li>
+                        <li><a href="https://bodydiscovery.jp/330/" class="drill-link" target="_blank">頚椎のベーシックモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/324/" class="drill-link" target="_blank">胸椎グライディング</a></li>
+                        <li><a href="https://bodydiscovery.jp/1739/" class="drill-link" target="_blank">ネックフィギュア8</a></li>
+                        <li><a href="https://bodydiscovery.jp/697/" class="drill-link" target="_blank">顎関節</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: 視床タイプ -->
+            <div class="result-section" id="result-thalamus">
+                <div class="card">
+                    <div class="result-type">視床皮質タイプ</div>
+                    <div class="result-subtitle">Thalamocortical - 感覚統合の中継点の問題</div>
+                    
+                    <div class="result-image-container">
+                        <img src="6.png" alt="視床皮質タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        <strong>視床</strong>は、どの感覚に注意を向けるかを決めています。<br><br>
+                        動きがぎこちない人、ヨガやピラティスなど、自分の体に注意を向けるのは得意だけど、スポーツは苦手な人はこのタイプです。<br><br>
+                        <strong>動きの意識を外側に持っていくワーク</strong>で体の不調やパフォーマンスが劇的に変化します！
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>動きを意識しすぎてギコちない動きをしてしまう</li>
+                        <li>右半身、左半身がうまく識別できない時がある</li>
+                        <li>ヨガやピラティスなどボディワークで体を意識する事が得意</li>
+                    </ul>
+
+                    <div class="section-title">選ぶドリル</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/166/" class="drill-link" target="_blank">股関節のターゲットワーク</a></li>
+                        <li><a href="https://bodydiscovery.jp/322/" class="drill-link" target="_blank">股関節のペンデュラムターゲットワーク</a></li>
+                        <li><a href="https://bodydiscovery.jp/523/" class="drill-link" target="_blank">胸椎のモビリゼーション</a></li>
+                        <li><a href="https://bodydiscovery.jp/241/" class="drill-link" target="_blank">首のアイソメトリックワーク</a></li>
+                        <li><a href="https://bodydiscovery.jp/1467/" class="drill-link" target="_blank">肩甲骨フロアモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/1751/" class="drill-link" target="_blank">骨盤フロアモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/1335/" class="drill-link" target="_blank">手根骨フロアモビリティ</a></li>
+                        <li><a href="https://bodydiscovery.jp/photo/band-training/" class="drill-link" target="_blank">すべてのバンドトレーニング</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+            <!-- 結果: 大脳皮質タイプ -->
+            <div class="result-section" id="result-cortex">
+                <div class="card">
+                    <div class="result-type">大脳新皮質タイプ</div>
+                    <div class="result-subtitle">Neocortex - 運動野・感覚野の問題</div>
+                    
+                    <div class="result-image-container">
+                        <img src="7.png" alt="大脳新皮質タイプ" class="result-image">
+                    </div>
+                    
+                    <div class="result-description">
+                        <strong>大脳新皮質</strong>は、右と左でその働きが違うことが体のバランスに影響します。<br><br>
+                        右半身は左の皮質、左半身は右の皮質が動かしていますね！<br><br>
+                        まずは<strong>左右差をチェック</strong>しましょう。<br><br>
+                        <strong>※盲点が大きい方と反対側の皮質の機能低下＝盲点が大きい側の体側でモーターコントロールを行う<br>
+                        例：右目の盲点なら、左皮質の問題。右半身のドリルを行う。</strong>
+                    </div>
+
+                    <div class="section-title">こんな人</div>
+                    <ul class="condition-list">
+                        <li>体の片側（同じ側）ばかりぶつける</li>
+                        <li>片側の聴力が低下している</li>
+                        <li>体の左右差を強く感じる</li>
+                    </ul>
+                    
+                    <div class="video-container">
+                        <div class="video-title">📹 盲点の左右差チェック動画</div>
+                        <div class="video-wrapper">
+                            <iframe src="https://player.vimeo.com/video/888909847?h=ec92f31a51" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="section-title">選ぶドリル（必ず反対側だけを行う）</div>
+                    <ul class="drill-list">
+                        <li><a href="https://bodydiscovery.jp/330/" class="drill-link" target="_blank">手根骨</a></li>
+                        <li><a href="https://bodydiscovery.jp/538/" class="drill-link" target="_blank">手首</a></li>
+                        <li><a href="https://bodydiscovery.jp/825/" class="drill-link" target="_blank">フィンガーウェーブ</a></li>
+                        <li><a href="https://bodydiscovery.jp/819/" class="drill-link" target="_blank">フィンガーサークル</a></li>
+                        <li><a href="https://bodydiscovery.jp/105/" class="drill-link" target="_blank">舟状骨トープル</a></li>
+                        <li><a href="https://bodydiscovery.jp/111/" class="drill-link" target="_blank">楔状骨トープル</a></li>
+                        <li><a href="https://bodydiscovery.jp/109/" class="drill-link" target="_blank">立方骨トープル</a></li>
+                        <li><a href="https://bodydiscovery.jp/144/" class="drill-link" target="_blank">股関節（ヒップサークル）</a></li>
+                        <li><a href="https://bodydiscovery.jp/1777/" class="drill-link" target="_blank">注視機能トレーニング</a></li>
+                    </ul>
+                    
+                    <button class="btn btn-restart" onclick="restart()">もう一度診断する</button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- フッター -->
+        <footer class="footer">
+            <p class="footer-text">© 2025 Functional Neuro Training</p>
+        </footer>
+    </div>
+
+    <!-- サイドメニュー -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <nav class="side-menu" id="sideMenu">
+        <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+        <div class="menu-header">
+            <h3>メニュー</h3>
+        </div>
+        <div class="menu-content">
+            <div class="menu-section">
+                <h4 class="menu-section-title">このアプリについて</h4>
+                <p>
+                    神経タイプ診断は、あなたの症状パターンから
+                    神経学的なタイプを分析するツールです。
+                    質問に答えることで、どの神経領域にアプローチすべきかが分かります。
+                </p>
+            </div>
+
+            <div class="menu-section">
+                <h4 class="menu-section-title">診断タイプ一覧</h4>
+                <ul class="type-list">
+                    <li><strong>レセプタータイプ</strong> - 感覚受容器の問題</li>
+                    <li><strong>末梢神経タイプ</strong> - 神経伝達の問題</li>
+                    <li><strong>脊髄タイプ</strong> - 中心軸の問題</li>
+                    <li><strong>小脳タイプ</strong> - 協調運動の問題</li>
+                    <li><strong>脳幹タイプ</strong> - 左右の神経統合の問題</li>
+                    <li><strong>視床皮質タイプ</strong> - 感覚統合の問題</li>
+                    <li><strong>大脳皮質タイプ</strong> - 運動野・感覚野の問題</li>
+                    <li><strong>島皮質タイプ</strong> - 内受容感覚の問題</li>
+                </ul>
+            </div>
+
+            <div class="menu-section">
+                <h4 class="menu-section-title">使い方</h4>
+                <p>
+                    1. 「診断を開始する」をタップ<br>
+                    2. 各質問に「はい」か「いいえ」で回答<br>
+                    3. 診断結果とアプローチ方法を確認<br>
+                    4. おすすめドリルのリンクから練習開始<br>
+                    5. 必要に応じて専門家に相談
+                </p>
+            </div>
+
+            <div class="menu-section">
+                <h4 class="menu-section-title">注意事項</h4>
+                <p class="warning-text">
+                    この診断は参考情報であり、医学的な診断ではありません。
+                    症状がある場合は、必ず専門の医療機関を受診してください。
+                </p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- iOS PWAインストール案内 -->
+    <div class="ios-install-prompt" id="iosInstallPrompt">
+        <div class="ios-install-content">
+            <div class="ios-install-text">
+                📱 ホーム画面に追加するには、共有ボタン<span style="font-size: 18px;">⬆</span>から「ホーム画面に追加」を選択
+            </div>
+            <button class="ios-install-close" onclick="closeIOSPrompt()">✕</button>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let currentSection = 'startSection';
+        let audioContext = null;
+
+        // スプラッシュスクリーン
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hidden');
+            }, 2000);
+            
+            // iOS PWAインストール案内
+            checkIOSInstallPrompt();
+        });
+
+        // オーディオコンテキスト初期化（iOS対策）
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        // 画面タッチでオーディオ初期化
+        document.addEventListener('touchstart', initAudio, { once: true });
+        document.addEventListener('click', initAudio, { once: true });
+
+        // メニュー制御
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const sideMenu = document.getElementById('sideMenu');
+
+        function openMenu() {
+            sideMenu.classList.add('active');
+            menuOverlay.classList.add('active');
+        }
+
+        function closeMenu() {
+            sideMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        }
+
+        menuBtn.addEventListener('click', openMenu);
+        closeMenuBtn.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+
+        // 診断開始
+        function startDiagnosis() {
+            showSection('q1');
+        }
+
+        // セクション表示
+        function showSection(sectionId) {
+            // 全セクションを非表示
+            document.querySelectorAll('.question-section, .result-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 指定セクションを表示
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+                currentSection = sectionId;
+                
+                // スクロールをトップに
+                document.getElementById('mainContent').scrollTop = 0;
+            }
+        }
+
+        // 回答処理
+        function answer(questionId, isYes) {
+            const flowchart = {
+                'q1': { yes: 'q2', no: 'q4' },
+                'q2': { yes: 'result-brainstem-injury', no: 'q3' },
+                'q3': { yes: 'result-peripheral', no: 'result-receptor' },
+                'q4': { yes: 'result-brainstem-lateral', no: 'q5' },
+                'q5': { yes: 'result-insula', no: 'q6' },
+                'q6': { yes: 'result-cerebellum', no: 'q7' },
+                'q7': { yes: 'result-spinal', no: 'q8' },
+                'q8': { yes: 'result-thalamus', no: 'result-cortex' }
+            };
+
+            const nextSection = isYes ? flowchart[questionId].yes : flowchart[questionId].no;
+            showSection(nextSection);
+        }
+
+        // リスタート
+        function restart() {
+            showSection('startSection');
+        }
+
+        // iOS PWAインストールプロンプト
+        function checkIOSInstallPrompt() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+            const hasSeenPrompt = localStorage.getItem('iosPromptSeen');
+
+            if (isIOS && !isInStandaloneMode && !hasSeenPrompt) {
+                setTimeout(() => {
+                    document.getElementById('iosInstallPrompt').classList.add('show');
+                }, 3000);
+            }
+        }
+
+        function closeIOSPrompt() {
+            document.getElementById('iosInstallPrompt').classList.remove('show');
+            localStorage.setItem('iosPromptSeen', 'true');
+        }
+
+        // スクロール防止（メインコンテンツ以外）
+        document.body.addEventListener('touchmove', function(e) {
+            const mainContent = document.getElementById('mainContent');
+            const menuContent = document.querySelector('.menu-content');
+            
+            if (!mainContent.contains(e.target) && !menuContent?.contains(e.target)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Service Worker登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker登録成功:', registration.scope);
+                        
+                        // 更新チェック
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    if (confirm('新しいバージョンが利用可能です。更新しますか？')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker登録失敗:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

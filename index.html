@@ -745,7 +745,7 @@
                 </div>
             </div>
 
-            <!-- Q1: 症状は片側のみ？ -->
+            <!-- Q1: 過去に怪我や手術、大きな打撲がある？ -->
             <div class="question-section" id="q1">
                 <div class="progress-container">
                     <div class="progress-bar">
@@ -755,10 +755,10 @@
                 </div>
                 <div class="card">
                     <p class="question-text">
-                        症状は<br>体の片側のみに出ますか？
+                        過去に怪我や手術、<br>大きな打撲がある？
                     </p>
                     <p class="question-note">
-                        例：右肩だけ痛い、左膝だけ違和感がある等
+                        骨折、捻挫、手術痕、打撲のあざ等
                     </p>
                     <div class="btn-container">
                         <button class="btn btn-yes" onclick="answer('q1', true)">はい</button>
@@ -767,7 +767,7 @@
                 </div>
             </div>
 
-            <!-- Q2: 症状の反対側に怪我の経験 -->
+            <!-- Q2: 症状の場所と過去の怪我が逆側の体側にある？ -->
             <div class="question-section" id="q2">
                 <div class="progress-container">
                     <div class="progress-bar">
@@ -777,7 +777,7 @@
                 </div>
                 <div class="card">
                     <p class="question-text">
-                        症状の反対側に<br>過去の怪我の経験はありますか？
+                        症状の場所と過去の怪我が<br>逆側の体側にある？
                     </p>
                     <p class="question-note">
                         例：右肩が痛いが、過去に左足を骨折した等
@@ -789,7 +789,7 @@
                 </div>
             </div>
 
-            <!-- Q3: 症状の箇所に感覚異常 -->
+            <!-- Q3: 過去の怪我の箇所の筋力が明らかに低下した？ -->
             <div class="question-section" id="q3">
                 <div class="progress-container">
                     <div class="progress-bar">
@@ -799,10 +799,10 @@
                 </div>
                 <div class="card">
                     <p class="question-text">
-                        症状の箇所に<br>感覚の異常はありますか？
+                        過去の怪我の箇所の筋力が<br>明らかに低下した？
                     </p>
                     <p class="question-note">
-                        しびれ、ピリピリ感、感覚の鈍さ等
+                        怪我をした部位の力が入りにくい等
                     </p>
                     <div class="btn-container">
                         <button class="btn btn-yes" onclick="answer('q3', true)">はい</button>
@@ -811,8 +811,8 @@
                 </div>
             </div>
 
-            <!-- Q4: 症状が片側のみに繰り返し起こる -->
-            <div class="question-section" id="q4">
+            <!-- Q5: 症状が全て片側にでる？ -->
+            <div class="question-section" id="q5">
                 <div class="progress-container">
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 25%;"></div>
@@ -821,20 +821,20 @@
                 </div>
                 <div class="card">
                     <p class="question-text">
-                        いつも同じ側（片側）で<br>症状が繰り返し起こる？
+                        症状が全て片側にでる？
                     </p>
                     <p class="question-note">
-                        怪我や痛みがいつも同じ側に出る等
+                        例：右肩、右肘、右首が痛い等、同じ側に症状が集中
                     </p>
                     <div class="btn-container">
-                        <button class="btn btn-yes" onclick="answer('q4', true)">はい</button>
-                        <button class="btn btn-no" onclick="answer('q4', false)">いいえ</button>
+                        <button class="btn btn-yes" onclick="answer('q5', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q5', false)">いいえ</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Q5: 動かなくても痛い -->
-            <div class="question-section" id="q5">
+            <!-- Q6: 動かなくても痛い、鈍痛や不快感が常にある？ -->
+            <div class="question-section" id="q6">
                 <div class="progress-container">
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 40%;"></div>
@@ -846,38 +846,19 @@
                         動かなくても痛い、<br>鈍痛や不快感が常にある？
                     </p>
                     <div class="btn-container">
-                        <button class="btn btn-yes" onclick="answer('q5', true)">はい</button>
-                        <button class="btn btn-no" onclick="answer('q5', false)">いいえ</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Q6: 不器用でスポーツが苦手 -->
-            <div class="question-section" id="q6">
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 55%;"></div>
-                    </div>
-                    <div class="progress-text">質問 4</div>
-                </div>
-                <div class="card">
-                    <p class="question-text">
-                        不器用でスポーツが苦手？
-                    </p>
-                    <div class="btn-container">
                         <button class="btn btn-yes" onclick="answer('q6', true)">はい</button>
                         <button class="btn btn-no" onclick="answer('q6', false)">いいえ</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Q7: バランスが悪く背骨が硬い -->
+            <!-- Q7: バランスが悪く、背骨が硬い？ -->
             <div class="question-section" id="q7">
                 <div class="progress-container">
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 70%;"></div>
+                        <div class="progress-fill" style="width: 55%;"></div>
                     </div>
-                    <div class="progress-text">質問 5</div>
+                    <div class="progress-text">質問 4</div>
                 </div>
                 <div class="card">
                     <p class="question-text">
@@ -890,8 +871,27 @@
                 </div>
             </div>
 
-            <!-- Q8: ボディワークは好きだけどボールスポーツは苦手 -->
+            <!-- Q8: 不器用でスポーツが苦手？ -->
             <div class="question-section" id="q8">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 70%;"></div>
+                    </div>
+                    <div class="progress-text">質問 5</div>
+                </div>
+                <div class="card">
+                    <p class="question-text">
+                        不器用でスポーツが苦手？
+                    </p>
+                    <div class="btn-container">
+                        <button class="btn btn-yes" onclick="answer('q8', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q8', false)">いいえ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q9: ボディワークは好きだけどボールスポーツは苦手？ -->
+            <div class="question-section" id="q9">
                 <div class="progress-container">
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 85%;"></div>
@@ -906,8 +906,8 @@
                         ヨガやストレッチは得意だが、球技は苦手等
                     </p>
                     <div class="btn-container">
-                        <button class="btn btn-yes" onclick="answer('q8', true)">はい</button>
-                        <button class="btn btn-no" onclick="answer('q8', false)">いいえ</button>
+                        <button class="btn btn-yes" onclick="answer('q9', true)">はい</button>
+                        <button class="btn btn-no" onclick="answer('q9', false)">いいえ</button>
                     </div>
                 </div>
             </div>
@@ -1449,14 +1449,14 @@
         // 回答処理
         function answer(questionId, isYes) {
             const flowchart = {
-                'q1': { yes: 'q2', no: 'q4' },
+                'q1': { yes: 'q2', no: 'q5' },
                 'q2': { yes: 'result-brainstem-injury', no: 'q3' },
                 'q3': { yes: 'result-peripheral', no: 'result-receptor' },
-                'q4': { yes: 'result-brainstem-lateral', no: 'q5' },
-                'q5': { yes: 'result-insula', no: 'q6' },
-                'q6': { yes: 'result-cerebellum', no: 'q7' },
+                'q5': { yes: 'result-brainstem-lateral', no: 'q6' },
+                'q6': { yes: 'result-insula', no: 'q7' },
                 'q7': { yes: 'result-spinal', no: 'q8' },
-                'q8': { yes: 'result-thalamus', no: 'result-cortex' }
+                'q8': { yes: 'result-cerebellum', no: 'q9' },
+                'q9': { yes: 'result-thalamus', no: 'result-cortex' }
             };
 
             const nextSection = isYes ? flowchart[questionId].yes : flowchart[questionId].no;

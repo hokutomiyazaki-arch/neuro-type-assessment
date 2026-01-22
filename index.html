@@ -12,31 +12,32 @@
     <title>神経タイプ診断</title>
     
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="FNT512.png">
-    <link rel="icon" type="image/png" href="FNT512.png">
+    <link rel="apple-touch-icon" href="FNT512-transparent.png">
+    <link rel="icon" type="image/png" href="FNT512-transparent.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ユニバーサルデザイン準拠配色 - WCAG 2.1 AA基準 */
+        /* 白と青を基調としたライトテーマ */
         :root {
-            --primary-bg: #1a1a2e;
-            --secondary-bg: #16213e;
-            --accent-color: #00a8e8;
-            --accent-light: #00d4ff;
-            --accent-dark: #0077b6;
-            --text-primary: #ffffff;
-            --text-secondary: #e0e0e0;
-            --text-on-dark: #ffffff;
-            --success-color: #00c853;
-            --warning-color: #ffab00;
-            --danger-color: #ff5252;
-            --card-bg: rgba(255, 255, 255, 0.12);
-            --border-color: rgba(255, 255, 255, 0.25);
-            --shadow-color: rgba(0, 0, 0, 0.4);
+            --primary-bg: #f5f8fc;
+            --secondary-bg: #ffffff;
+            --accent-color: #0077b6;
+            --accent-light: #00a8e8;
+            --accent-dark: #005a8c;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555555;
+            --text-on-accent: #ffffff;
+            --success-color: #00875a;
+            --warning-color: #ff8f00;
+            --danger-color: #d32f2f;
+            --card-bg: #ffffff;
+            --border-color: #e1e5eb;
+            --shadow-color: rgba(0, 119, 182, 0.1);
             --gold-color: #c5a47e;
+            --header-bg: #0a2540;
         }
 
         * {
@@ -46,19 +47,19 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
+        html {
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            position: fixed;
-            top: 0;
-            left: 0;
-            touch-action: none;
         }
 
         body {
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            overflow: hidden;
             font-family: 'Noto Sans JP', 'Outfit', sans-serif;
-            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            background: var(--primary-bg);
             color: var(--text-primary);
             line-height: 1.7;
             font-weight: 400;
@@ -71,7 +72,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            background: linear-gradient(135deg, #0a2540 0%, #0077b6 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -97,7 +98,7 @@
             font-size: 18px;
             font-weight: 700;
             letter-spacing: 2px;
-            color: var(--text-primary);
+            color: #ffffff;
             margin-bottom: 16px;
             text-align: center;
         }
@@ -105,14 +106,14 @@
         .splash-app-name {
             font-size: 26px;
             font-weight: 900;
-            color: var(--accent-light);
+            color: #00d4ff;
             margin-bottom: 32px;
             text-align: center;
         }
 
         .splash-copyright {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.7);
             text-align: center;
         }
 
@@ -136,8 +137,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border-bottom: 1px solid var(--border-color);
+            background: #0a2540;
+            border-bottom: 2px solid var(--gold-color);
             flex-shrink: 0;
             padding-top: max(12px, env(safe-area-inset-top));
         }
@@ -150,7 +151,7 @@
         .header-title {
             font-size: 18px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: #ffffff;
         }
 
         .menu-btn {
@@ -171,7 +172,7 @@
             display: block;
             width: 24px;
             height: 3px;
-            background: var(--text-primary);
+            background: #ffffff;
             border-radius: 2px;
             transition: all 0.3s ease;
         }
@@ -193,18 +194,18 @@
 
         /* カード */
         .card {
-            background: rgba(30, 40, 60, 0.95);
+            background: #ffffff;
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e1e5eb;
+            box-shadow: 0 4px 20px rgba(0, 119, 182, 0.1);
         }
 
         .card-title {
             font-size: 22px;
             font-weight: 900;
-            color: var(--accent-light);
+            color: #0a2540;
             margin-bottom: 16px;
             text-align: center;
         }
@@ -212,7 +213,7 @@
         .card-description {
             font-size: 15px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: #333333;
             line-height: 1.9;
             margin-bottom: 20px;
         }
@@ -235,19 +236,22 @@
         .question-text {
             font-size: 20px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: #0a2540;
             text-align: center;
             margin-bottom: 24px;
             line-height: 1.8;
+            display: block;
+            visibility: visible;
+            opacity: 1;
         }
 
         .question-note {
             font-size: 14px;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: #555555;
             text-align: center;
             margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.08);
+            background: #f0f4f8;
             padding: 12px;
             border-radius: 8px;
         }
@@ -276,37 +280,37 @@
         }
 
         .btn-yes {
-            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+            background: linear-gradient(135deg, #0077b6 0%, #005a8c 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(0, 168, 232, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 119, 182, 0.4);
         }
 
         .btn-yes:hover, .btn-yes:active {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 168, 232, 0.5);
+            box-shadow: 0 6px 20px rgba(0, 119, 182, 0.5);
         }
 
         .btn-no {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text-primary);
-            border: 2px solid var(--border-color);
+            background: #f0f4f8;
+            color: #0a2540;
+            border: 2px solid #e1e5eb;
         }
 
         .btn-no:hover, .btn-no:active {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: var(--accent-color);
+            background: #e1e5eb;
+            border-color: #0077b6;
         }
 
         .btn-restart {
-            background: linear-gradient(135deg, var(--warning-color) 0%, #ff8f00 100%);
-            color: #1a1a1a;
+            background: linear-gradient(135deg, #0a2540 0%, #1a3a5c 100%);
+            color: #ffffff;
             margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(255, 171, 0, 0.4);
+            box-shadow: 0 4px 15px rgba(10, 37, 64, 0.4);
         }
 
         .btn-restart:hover, .btn-restart:active {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 171, 0, 0.5);
+            box-shadow: 0 6px 20px rgba(10, 37, 64, 0.5);
         }
 
         /* 結果セクション */
@@ -322,16 +326,15 @@
         .result-type {
             font-size: 32px;
             font-weight: 900;
-            color: var(--success-color);
+            color: #0077b6;
             text-align: center;
             margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0, 200, 83, 0.3);
         }
 
         .result-subtitle {
             font-size: 15px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: #555555;
             text-align: center;
             margin-bottom: 24px;
         }
@@ -343,7 +346,7 @@
             margin: 0 auto 24px;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 30px rgba(0, 119, 182, 0.15);
         }
 
         .result-image {
@@ -355,17 +358,17 @@
         .result-description {
             font-size: 16px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: #333333;
             line-height: 2;
             padding: 20px;
-            background: rgba(0, 200, 83, 0.15);
+            background: #e8f4fc;
             border-radius: 12px;
-            border-left: 5px solid var(--success-color);
+            border-left: 5px solid #0077b6;
             margin-bottom: 20px;
         }
 
         .result-description strong {
-            color: var(--accent-light);
+            color: #0077b6;
             font-weight: 700;
         }
 
@@ -373,10 +376,10 @@
         .section-title {
             font-size: 16px;
             font-weight: 700;
-            color: var(--gold-color);
+            color: #0a2540;
             margin: 24px 0 12px 0;
             padding-left: 12px;
-            border-left: 4px solid var(--gold-color);
+            border-left: 4px solid #c5a47e;
         }
 
         .condition-list {
@@ -387,15 +390,15 @@
 
         .condition-list li {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: #555555;
             padding: 8px 0 8px 24px;
             position: relative;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e1e5eb;
         }
 
         .condition-list li::before {
             content: "✓";
-            color: var(--success-color);
+            color: #0077b6;
             position: absolute;
             left: 0;
             font-weight: bold;
@@ -417,7 +420,7 @@
 
         .drill-list li::before {
             content: "▶";
-            color: var(--gold-color);
+            color: #c5a47e;
             position: absolute;
             left: 0;
             font-size: 10px;
@@ -425,15 +428,15 @@
         }
 
         .drill-link {
-            color: var(--accent-light);
+            color: #0077b6;
             text-decoration: none;
-            border-bottom: 1px dotted rgba(0, 212, 255, 0.5);
+            border-bottom: 1px dotted rgba(0, 119, 182, 0.5);
             transition: all 0.2s;
         }
 
         .drill-link:hover, .drill-link:active {
-            color: var(--gold-color);
-            border-bottom-color: var(--gold-color);
+            color: #005a8c;
+            border-bottom-color: #005a8c;
         }
 
         /* 動画コンテナ */
@@ -441,15 +444,16 @@
             margin: 24px 0;
             border-radius: 12px;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.3);
+            background: #f0f4f8;
+            border: 1px solid #e1e5eb;
         }
 
         .video-title {
             font-size: 16px;
             font-weight: 700;
-            color: var(--accent-light);
+            color: #0a2540;
             padding: 16px;
-            background: rgba(0, 0, 0, 0.2);
+            background: #e8f4fc;
             text-align: center;
         }
 
@@ -476,14 +480,14 @@
 
         .progress-bar {
             height: 8px;
-            background: rgba(255, 255, 255, 0.15);
+            background: #e1e5eb;
             border-radius: 4px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-light) 100%);
+            background: linear-gradient(90deg, #0077b6 0%, #00a8e8 100%);
             border-radius: 4px;
             transition: width 0.4s ease;
         }
@@ -491,7 +495,7 @@
         .progress-text {
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: #555555;
             text-align: right;
             margin-top: 8px;
         }
@@ -499,15 +503,15 @@
         /* フッター */
         .footer {
             padding: 12px 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid var(--border-color);
+            background: #0a2540;
+            border-top: 2px solid #c5a47e;
             flex-shrink: 0;
             padding-bottom: max(12px, env(safe-area-inset-bottom));
         }
 
         .footer-text {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.7);
             text-align: center;
         }
 
@@ -518,7 +522,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.5);
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
@@ -537,12 +541,13 @@
             width: 320px;
             max-width: 85vw;
             height: 100%;
-            background: var(--secondary-bg);
+            background: #ffffff;
             transition: right 0.3s ease;
             z-index: 1000;
             display: flex;
             flex-direction: column;
             padding-top: max(20px, env(safe-area-inset-top));
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
         }
 
         .side-menu.active {
@@ -555,10 +560,10 @@
             right: 15px;
             width: 40px;
             height: 40px;
-            background: rgba(255, 255, 255, 0.1);
+            background: #f0f4f8;
             border: none;
             border-radius: 50%;
-            color: var(--text-primary);
+            color: #0a2540;
             font-size: 20px;
             cursor: pointer;
             display: flex;
@@ -568,13 +573,13 @@
 
         .menu-header {
             padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #e1e5eb;
         }
 
         .menu-header h3 {
             font-size: 20px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: #0a2540;
         }
 
         .menu-content {
@@ -596,15 +601,15 @@
         .menu-section-title {
             font-size: 14px;
             font-weight: 700;
-            color: var(--accent-light);
+            color: #0077b6;
             margin-bottom: 12px;
             padding-bottom: 8px;
-            border-bottom: 2px solid var(--accent-color);
+            border-bottom: 2px solid #0077b6;
         }
 
         .menu-section p {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: #555555;
             line-height: 1.8;
         }
 
@@ -615,20 +620,21 @@
 
         .type-list li {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: #555555;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e1e5eb;
         }
 
         .type-list li strong {
-            color: var(--text-primary);
+            color: #0a2540;
         }
 
         .warning-text {
-            background: rgba(255, 82, 82, 0.15);
+            background: #fff3e0;
             padding: 12px;
             border-radius: 8px;
-            border-left: 3px solid var(--danger-color);
+            border-left: 3px solid #ff8f00;
+            color: #5d4037;
         }
 
         /* iOS PWAインストール案内 */
@@ -637,10 +643,10 @@
             bottom: -100px;
             left: 0;
             right: 0;
-            background: var(--secondary-bg);
+            background: #0a2540;
             padding: 16px;
             padding-bottom: max(16px, env(safe-area-inset-bottom));
-            border-top: 1px solid var(--border-color);
+            border-top: 2px solid #c5a47e;
             transition: bottom 0.3s ease;
             z-index: 998;
         }
@@ -659,17 +665,17 @@
 
         .ios-install-text {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.9);
             line-height: 1.6;
         }
 
         .ios-install-close {
             width: 32px;
             height: 32px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             border-radius: 50%;
-            color: var(--text-primary);
+            color: #ffffff;
             font-size: 16px;
             cursor: pointer;
             flex-shrink: 0;
@@ -678,16 +684,16 @@
 
         /* スタートボタン */
         .btn-start {
-            background: linear-gradient(135deg, var(--success-color) 0%, #00a844 100%);
+            background: linear-gradient(135deg, #0077b6 0%, #005a8c 100%);
             color: white;
             font-size: 20px;
             padding: 20px 32px;
-            box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 119, 182, 0.4);
         }
 
         .btn-start:hover, .btn-start:active {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 200, 83, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 119, 182, 0.5);
         }
 
         /* ドリルカテゴリ */
@@ -705,7 +711,7 @@
 <body>
     <!-- スプラッシュスクリーン -->
     <div class="splash-screen" id="splashScreen">
-        <img src="FNT512.png" alt="FNT Logo" class="splash-logo">
+        <img src="FNT512-transparent.png" alt="FNT Logo" class="splash-logo">
         <div class="splash-title">FUNCTIONAL NEURO TRAINING</div>
         <div class="splash-app-name">神経タイプ診断</div>
         <div class="splash-copyright">© Legrandchariot</div>
@@ -714,7 +720,7 @@
     <div class="app-container">
         <!-- ヘッダー -->
         <header class="header">
-            <img src="FNT512.png" alt="FNT" class="header-logo">
+            <img src="FNT512-transparent.png" alt="FNT" class="header-logo">
             <h1 class="header-title">神経タイプ診断</h1>
             <button class="menu-btn" id="menuBtn">
                 <span></span>
